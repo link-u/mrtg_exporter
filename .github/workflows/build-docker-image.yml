@@ -13,10 +13,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Push to GitHub Container Registry
-        uses: docker/build-push-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
         with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.ACCESS_TOKEN }}
           registry: ghcr.io
-          repository: link-u/mrtg_exporter
+          username: 'ledyba-z'
+          password: ${{ secrets.GH_ACTION_GHCR_TOKEN_LEDYBA_Z }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        id: docker_build
+        with:
+          push: true
+          tags: ghcr.io/link-u/mrtg_exporter:latest
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
