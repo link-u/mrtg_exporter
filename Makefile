@@ -10,3 +10,7 @@ clean:
 .PHONY: cl
 cl:
 	find . -type f -name *.go | xargs wc -l
+
+.PHONY: test
+test:
+	go test ./...
