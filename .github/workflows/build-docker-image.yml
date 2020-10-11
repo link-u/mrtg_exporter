@@ -23,7 +23,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_ACTION_GHCR_TOKEN_LEDYBA_Z }}
       - name: Build and push
-        uses: docker/build-push-action@v1.1.1
+        uses: docker/build-push-action@v2
         id: docker_build
         with:
           registry: ghcr.io
