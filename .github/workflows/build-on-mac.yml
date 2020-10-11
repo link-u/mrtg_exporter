@@ -19,7 +19,7 @@ jobs:
       - name: Run tests
         run: make test
       - name: Build
-        run: make build
+        run: make mrtg_exporter
       - name: Upload result
         uses: actions/upload-artifact@v2
         with:
