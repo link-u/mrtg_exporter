@@ -1,4 +1,4 @@
-name: Build on Linux
+name: Build on macOS
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
@@ -19,9 +19,9 @@ jobs:
       - name: Run tests
         run: make test
       - name: Build
-        run: make mrtg_exporter
+        run: make build
       - name: Upload result
         uses: actions/upload-artifact@v2
         with:
-          name: mrtg_exporter
-          path: mrtg_exporter
+          name: Pittari_macOS_x86_64
+          path: .bin/Pittari
