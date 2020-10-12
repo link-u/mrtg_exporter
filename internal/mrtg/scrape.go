@@ -11,25 +11,20 @@ import (
 	"time"
 )
 
-type AuthenticateInfo struct {
-	BasicAuth struct {
-		User     string
-		Password string
-	}
+type Exporter struct {
+	Timeout time.Duration
+	URL     *url.URL
 }
 
 var metricPattern = regexp.MustCompile(`<!-- (maxin|maxout|avin|avout|cuin|cuout|avmxin|avmxout) ([dwmy]) (\d+) -->`)
 
-func Scrape(c context.Context, url *url.URL, timeout time.Duration, auth *AuthenticateInfo) (*Metrics, error) {
+func (exp *Exporter) Scrape(c context.Context) (*Metrics, error) {
 	var metrics Metrics
-	client := &http.Client{Timeout: timeout}
+	client := &http.Client{Timeout: exp.Timeout}
 
-	req, err := http.NewRequestWithContext(c, "GET", url.String(), nil)
+	req, err := http.NewRequestWithContext(c, "GET", exp.URL.String(), nil)
 	if err != nil {
 		return nil, err
-	}
-	if len(auth.BasicAuth.User) > 0 || len(auth.BasicAuth.Password) > 0 {
-		req.SetBasicAuth(auth.BasicAuth.User, auth.BasicAuth.Password)
 	}
 	resp, err := client.Do(req)
 	if err != nil {
