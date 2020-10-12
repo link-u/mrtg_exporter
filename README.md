@@ -7,6 +7,35 @@
 
 `mrtg_exporter` scrapes [MRTG](https://oss.oetiker.ch/mrtg/) 's index pages and converts to prometheus metrics.
 
+# How to use?
+
+## docker-compose.yml
+
+```yaml
+  mrtg-exporter:
+    image: ghcr.io/link-u/mrtg_exporter
+    expose:
+      - 9230
+    restart: always
+```
+
+## Prometheus config
+
+```yaml
+  - job_name: 'mrtg'
+    metrics_path: '/probe'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: '<mrtg-exporter>:9230'
+    static_configs:
+      - targets:
+        - 'nickname https://user:pass@mrtg.example.com/path/to/mrtg/'
+```
+
 # License
 
 MIT
