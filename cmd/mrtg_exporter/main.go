@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -32,9 +33,23 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 var probePath = flag.String("web.probe-path", "/probe", "Path under which to expose metrics")
 
+var whiteSpace = regexp.MustCompile(`\s+`)
+
 func probeHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
 	targetRaw := r.URL.Query().Get("target")
-	target, err := url.Parse(targetRaw)
+	targets := whiteSpace.Split(targetRaw, -1)
+	var name string
+	var urlRaw string
+	var scrapingURL *url.URL
+	if len(targets) >= 1 {
+		name = targets[0]
+		urlRaw = targets[1]
+	} else {
+		name = targets[0]
+		urlRaw = targets[0]
+	}
+	scrapingURL, err = url.Parse(urlRaw)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Inalid URL: %s\nErr=%v", targetRaw, err), 500)
 		return
@@ -57,8 +72,9 @@ func probeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	exp := &mrtg.Exporter{}
+	exp.Name = name
 	exp.Timeout = time.Duration(float64(time.Second) * timeoutSeconds)
-	exp.URL = target
+	exp.URL = scrapingURL
 
 	registry := prometheus.NewRegistry()
 	registry.MustRegister(exp)

@@ -12,8 +12,9 @@ import (
 )
 
 type Exporter struct {
-	Timeout time.Duration
+	Name    string
 	URL     *url.URL
+	Timeout time.Duration
 }
 
 var metricPattern = regexp.MustCompile(`<!-- (maxin|maxout|avin|avout|cuin|cuout|avmxin|avmxout) ([dwmy]) (\d+) -->`)
