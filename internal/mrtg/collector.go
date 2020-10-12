@@ -14,42 +14,42 @@ var (
 	currentIn = prometheus.NewDesc(
 		prometheus.BuildFQName(namespace, "", "current_in"),
 		"Incoming Traffic in Bits per Second",
-		[]string{"interval"}, nil,
+		[]string{"target", "interval"}, nil,
 	)
 	currentOut = prometheus.NewDesc(
 		prometheus.BuildFQName(namespace, "", "current_out"),
 		"Outgoing Traffic in Bits per Second",
-		[]string{"interval"}, nil,
+		[]string{"target", "interval"}, nil,
 	)
 	averageIn = prometheus.NewDesc(
 		prometheus.BuildFQName(namespace, "", "average_in"),
 		"Average Incoming Traffic in Bits per Second",
-		[]string{"interval"}, nil,
+		[]string{"target", "interval"}, nil,
 	)
 	averageOut = prometheus.NewDesc(
 		prometheus.BuildFQName(namespace, "", "average_out"),
 		"Average Outgoing Traffic in Bits per Second",
-		[]string{"interval"}, nil,
+		[]string{"target", "interval"}, nil,
 	)
 	maxIn = prometheus.NewDesc(
 		prometheus.BuildFQName(namespace, "", "max_in"),
 		"Max Incoming Traffic in Bits per Second",
-		[]string{"interval"}, nil,
+		[]string{"target", "interval"}, nil,
 	)
 	maxOut = prometheus.NewDesc(
 		prometheus.BuildFQName(namespace, "", "max_out"),
 		"Max Outgoing Traffic in Bits per Second",
-		[]string{"interval"}, nil,
+		[]string{"target", "interval"}, nil,
 	)
 	averageMaxIn = prometheus.NewDesc(
 		prometheus.BuildFQName(namespace, "", "average_max_in"),
 		"Average Max Incoming Traffic in Bits per Second",
-		[]string{"interval"}, nil,
+		[]string{"target", "interval"}, nil,
 	)
 	averageMaxOut = prometheus.NewDesc(
 		prometheus.BuildFQName(namespace, "", "average_max_out"),
 		"Average Max Outgoing Traffic in Bits per Second",
-		[]string{"interval"}, nil,
+		[]string{"target", "interval"}, nil,
 	)
 )
 
@@ -71,6 +71,13 @@ func (exp *Exporter) Collect(ch chan<- prometheus.Metric) {
 	if exp.URL == nil || exp.URL.String() == "" {
 		log.Warn("Empty URL", zap.String("url", fmt.Sprintf("%v", exp.URL)))
 		return
+	}
+	var target string
+	{
+		// Create URL without userinfo
+		url := *exp.URL
+		url.User = nil
+		target = url.String()
 	}
 	result, err := exp.Scrape(context.Background())
 	if err != nil {
@@ -100,28 +107,28 @@ func (exp *Exporter) Collect(ch chan<- prometheus.Metric) {
 	}
 	for _, pair := range pairs {
 		ch <- prometheus.MustNewConstMetric(
-			currentIn, prometheus.GaugeValue, float64(pair.metric.CurrentIn), pair.interval,
+			currentIn, prometheus.GaugeValue, float64(pair.metric.CurrentIn), target, pair.interval,
 		)
 		ch <- prometheus.MustNewConstMetric(
-			currentOut, prometheus.GaugeValue, float64(pair.metric.CurrentOut), pair.interval,
+			currentOut, prometheus.GaugeValue, float64(pair.metric.CurrentOut), target, pair.interval,
 		)
 		ch <- prometheus.MustNewConstMetric(
-			maxIn, prometheus.GaugeValue, float64(pair.metric.MaxIn), pair.interval,
+			maxIn, prometheus.GaugeValue, float64(pair.metric.MaxIn), target, pair.interval,
 		)
 		ch <- prometheus.MustNewConstMetric(
-			maxOut, prometheus.GaugeValue, float64(pair.metric.MaxOut), pair.interval,
+			maxOut, prometheus.GaugeValue, float64(pair.metric.MaxOut), target, pair.interval,
 		)
 		ch <- prometheus.MustNewConstMetric(
-			averageIn, prometheus.GaugeValue, float64(pair.metric.AverageIn), pair.interval,
+			averageIn, prometheus.GaugeValue, float64(pair.metric.AverageIn), target, pair.interval,
 		)
 		ch <- prometheus.MustNewConstMetric(
-			averageOut, prometheus.GaugeValue, float64(pair.metric.AverageOut), pair.interval,
+			averageOut, prometheus.GaugeValue, float64(pair.metric.AverageOut), target, pair.interval,
 		)
 		ch <- prometheus.MustNewConstMetric(
-			averageMaxIn, prometheus.GaugeValue, float64(pair.metric.AverageMaxIn), pair.interval,
+			averageMaxIn, prometheus.GaugeValue, float64(pair.metric.AverageMaxIn), target, pair.interval,
 		)
 		ch <- prometheus.MustNewConstMetric(
-			averageMaxOut, prometheus.GaugeValue, float64(pair.metric.AverageMaxOut), pair.interval,
+			averageMaxOut, prometheus.GaugeValue, float64(pair.metric.AverageMaxOut), target, pair.interval,
 		)
 	}
 }
