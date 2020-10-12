@@ -42,7 +42,7 @@ func probeHandler(w http.ResponseWriter, r *http.Request) {
 	var name string
 	var urlRaw string
 	var scrapingURL *url.URL
-	if len(targets) >= 1 {
+	if len(targets) >= 2 {
 		name = targets[0]
 		urlRaw = targets[1]
 	} else {
