@@ -83,7 +83,7 @@ func probeHandler(w http.ResponseWriter, r *http.Request) {
 	h.ServeHTTP(w, r)
 }
 
-var metricsPath = flag.String("web.metric-path", "/metric", "Path under which to expose metrics")
+var metricsPath = flag.String("web.metric-path", "/metrics", "Path under which to expose metrics")
 
 var listenAddress = flag.String("web.listen-address", ":9230", "Address to listen on for web interface and telemetry.")
 
